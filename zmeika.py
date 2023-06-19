@@ -59,26 +59,20 @@ def snake(width_snake, snake_spisok):
     for x in snake_spisok:
         pygame.draw.rect(dis,blue,[x[0],x[1],width_snake,width_snake]) #отрисовка прямоугольника синего цвета на игровом дисплее
 while not game_over: #начало основного цикла игры. Пока True, игра продолжается
-    if apple_x == blok_x or apple_y == blok_y:
-        continue
-    elif x_1_change == blok_x or y_1_change == blok_y:
-        continue
-    elif x_1 == blok_x or y_1 == blok_y:
-        continue
     for event in pygame.event.get(): #цикл обработки событий
         if event.type == pygame.QUIT: #проверяем, не является ли текущее событие выходом из игры
             game_over = True
         if event.type == pygame.KEYDOWN: #задаем вопрос, не нажата ли какая-то клавиша
-            if event.key == pygame.K_LEFT: #если нажата клавиша стрелка влево
+            if event.key == pygame.K_LEFT and x_1_change == 0: #если нажата клавиша стрелка влево
                 x_1_change = -width_snake*0.1 #змейка будет ползти влево на 10 пикселей каждый фрейм игры
                 y_1_change = 0 #в таком случае, вверх или влево ползти не нужно
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_RIGHT and x_1_change == 0:
                 x_1_change = width_snake*0.1 #змейка будет ползти вправо на 10 пикселей каждый фрейм игры
                 y_1_change = 0
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP and y_1_change == 0:
                 y_1_change = -width_snake*0.1 #змейка будет ползти вверх на 10 пикселей каждый фрейм игры
                 x_1_change = 0
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and y_1_change == 0:
                 y_1_change = width_snake*0.1 #змейка будет ползти вниз на 10 пикселей каждый фрейм игры
                 x_1_change = 0
 
@@ -115,13 +109,15 @@ while not game_over: #начало основного цикла игры. По�
         time.sleep(2)
         game_over = True
 
-    if x_1 in range(apple_x,apple_x+10,1) and y_1 in range(apple_y,apple_y+10,1):
+    if x_1 in range(apple_x-10,apple_x+10,1) and y_1 in range(apple_y-10,apple_y+10,1):
         eating_sound.play()
         print('Съел!')
         apple_x = random.randrange(50, window_size[0]-50, 1)
         apple_y = random.randrange(50, window_size[1]-50, 1)
-        blok_x = random.randrange(50, window_size[0]-50, 1)
-        blok_y = random.randrange(50, window_size[1]-50, 1)
+        if apple_x != blok_x and blok_x != x_1_change:
+            blok_x = random.randrange(50, window_size[0]-50, 1)
+        if apple_y != blok_y and blok_y != y_1_change:
+            blok_y = random.randrange(50, window_size[1]-50, 1)
         score += 1
         speed_snake += 1.5
         speed_ = round(speed_snake, 1)
