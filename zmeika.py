@@ -33,11 +33,11 @@ y_1 = 300 #по вертикали
 x_1_change = 0 #на сколько пикселей сдвигается змейка (влево-вправо)
 y_1_change = 0 #на сколько пикселей сдвигается змейка (вниз-вверх)
 #Координаты яблока:
-apple_x = random.randrange(0,window_size[0],10)
-apple_y = random.randrange(0,window_size[1],10)
+apple_x = random.randrange(10,window_size[0]-10,1)
+apple_y = random.randrange(10,window_size[1]-10,1)
 
-blok_x = random.randrange(0,window_size[0],30)
-blok_y = random.randrange(0,window_size[1],30)
+blok_x = random.randrange(50,window_size[0]-50,1)
+blok_y = random.randrange(50,window_size[1]-50,1)
 
 game_over_sound = pygame.mixer.Sound('Game_over.mp3')
 eating_sound = pygame.mixer.Sound('apple_biting.mp3')
@@ -50,7 +50,7 @@ Dlina_zmei = 1
 
 width_snake = 10
 
-speed_snake = 5
+speed_snake = 30
 speed_ = speed_snake
 score = 0 #объявляем счетчик очков
 font = pygame.font.Font(None,28) #font - объект класса Font, шрифт 36 размера
@@ -58,26 +58,31 @@ font = pygame.font.Font(None,28) #font - объект класса Font, шри�
 def snake(width_snake, snake_spisok):
     for x in snake_spisok:
         pygame.draw.rect(dis,blue,[x[0],x[1],width_snake,width_snake]) #отрисовка прямоугольника синего цвета на игровом дисплее
-
 while not game_over: #начало основного цикла игры. Пока True, игра продолжается
+    if apple_x == blok_x or apple_y == blok_y:
+        continue
+    elif x_1_change == blok_x or y_1_change == blok_y:
+        continue
+    elif x_1 == blok_x or y_1 == blok_y:
+        continue
     for event in pygame.event.get(): #цикл обработки событий
         if event.type == pygame.QUIT: #проверяем, не является ли текущее событие выходом из игры
             game_over = True
         if event.type == pygame.KEYDOWN: #задаем вопрос, не нажата ли какая-то клавиша
             if event.key == pygame.K_LEFT: #если нажата клавиша стрелка влево
-                x_1_change = -width_snake #змейка будет ползти влево на 10 пикселей каждый фрейм игры
+                x_1_change = -width_snake*0.1 #змейка будет ползти влево на 10 пикселей каждый фрейм игры
                 y_1_change = 0 #в таком случае, вверх или влево ползти не нужно
             if event.key == pygame.K_RIGHT:
-                x_1_change = width_snake #змейка будет ползти вправо на 10 пикселей каждый фрейм игры
+                x_1_change = width_snake*0.1 #змейка будет ползти вправо на 10 пикселей каждый фрейм игры
                 y_1_change = 0
             if event.key == pygame.K_UP:
-                y_1_change = -width_snake #змейка будет ползти вверх на 10 пикселей каждый фрейм игры
+                y_1_change = -width_snake*0.1 #змейка будет ползти вверх на 10 пикселей каждый фрейм игры
                 x_1_change = 0
             if event.key == pygame.K_DOWN:
-                y_1_change = width_snake #змейка будет ползти вниз на 10 пикселей каждый фрейм игры
+                y_1_change = width_snake*0.1 #змейка будет ползти вниз на 10 пикселей каждый фрейм игры
                 x_1_change = 0
 
-    if x_1>= window_size[0] or y_1 >= window_size[1] or x_1<=0 or y_1<=0:
+    if x_1 > window_size[0] or y_1 > window_size[1] or x_1 < 0 or y_1 < 0:
         game_over_sound.play()
         time.sleep(2)
         game_over = True
@@ -85,12 +90,15 @@ while not game_over: #начало основного цикла игры. По�
     x_1 += x_1_change  # изменение фактических координат змейки
     y_1 += y_1_change
 
+    # clock.tick(speed_snake)
+    time_elapsed = pygame.time.get_ticks() // 1000
+
     dis.fill(white) #заполняю экран белым цветом, чтобы очистить всё, что до этого там находилось
     dis1.fill(white1)
     snake(width_snake, snake_spisok)
     nadpis_score = font.render('Очки: ' + str(score),True,red) #создали переменную nadpis, которая хранит надпись
     nadpis_speed = font.render('Скорость : ' + str(speed_), True, purp)
-    nadpis_cloc = font.render('Время : ' + str(clock.get_time()), True, blak)
+    nadpis_cloc = font.render('Время : ' + str(time_elapsed), True, blak)
     dis1.blit(nadpis_score,(5,5))
     dis1.blit(nadpis_speed, (5, 25))
     dis1.blit(nadpis_cloc, (5, 50))
@@ -98,7 +106,8 @@ while not game_over: #начало основного цикла игры. По�
     pygame.draw.rect(dis, red, [apple_x, apple_y, 10, 10]) #отрисовка яблока
     pygame.display.update() #обновление экрана для отображения изменений
 
-    if x_1 == blok_x and y_1 == blok_y:
+
+    if x_1 in range(blok_x,blok_x+30,1) and y_1 in range(blok_y,blok_y+30,1):
         blok_sound.play()
         time.sleep(2)
         print('Удар!')
@@ -106,26 +115,24 @@ while not game_over: #начало основного цикла игры. По�
         time.sleep(2)
         game_over = True
 
-    if x_1 == apple_x and y_1 == apple_y:
+    if x_1 in range(apple_x,apple_x+10,1) and y_1 in range(apple_y,apple_y+10,1):
         eating_sound.play()
         print('Съел!')
-        apple_x = random.randrange(0, window_size[0], 10)
-        apple_y = random.randrange(0, window_size[1], 10)
-        blok_x = random.randrange(0, window_size[0], 30)
-        blok_y = random.randrange(0, window_size[1], 30)
+        apple_x = random.randrange(50, window_size[0]-50, 1)
+        apple_y = random.randrange(50, window_size[1]-50, 1)
+        blok_x = random.randrange(50, window_size[0]-50, 1)
+        blok_y = random.randrange(50, window_size[1]-50, 1)
         score += 1
-        speed_snake += 0.1
+        speed_snake += 1.5
         speed_ = round(speed_snake, 1)
-        Dlina_zmei += 1
+        Dlina_zmei += 10
 
     snake_Head = []
-    snake_Head.append(x_1)
-    snake_Head.append(y_1)
-    snake_spisok.append(snake_Head)
+    snake_spisok.append((x_1, y_1))
     if len(snake_spisok) > Dlina_zmei:
         del snake_spisok[0]
     for x in snake_spisok[:-1]:
-        if x == snake_Head:
+        if x == (x_1, y_1):
             game_over_sound.play()
             time.sleep(2)
             game_over = True
